@@ -42,6 +42,9 @@ PeaversCommons.SlashCommands:Register(addonName, "pscaler", {
     disable = function()
         PS.Scaler:Disable()
     end,
+    restore = function()
+        PS.Scaler:RestoreOriginal()
+    end,
     info = function()
         PS.Scaler:PrintInfo()
     end,
@@ -58,6 +61,7 @@ PeaversCommons.SlashCommands:Register(addonName, "pscaler", {
         print("  /pscaler set N - Set a specific scale (e.g. 0.65)")
         print("  /pscaler enable - Enable UI scaling")
         print("  /pscaler disable - Disable and restore your original scale")
+        print("  /pscaler restore - Undo everything: restore your original scale and turn scaling off")
         print("  /pscaler info - Print scale diagnostics")
         print("  /pscaler config - Open settings")
     end

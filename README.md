@@ -12,7 +12,7 @@ A World of Warcraft addon that scales the entire UI with resolution presets, a f
 - Pixel-perfect mode (768 ÷ screen height) for crisp 1:1 rendering, like classic ElvUI
 - Supports scales below Blizzard's 0.64 slider floor
 - Completely inert until you enable it — never touches your UI without opt-in
-- Restores your original Blizzard scale when disabled
+- One-click restore that undoes everything, returning the scale you had before the addon changed anything
 <!-- /peavers:features -->
 
 ## Usage
@@ -26,6 +26,7 @@ Open the settings with `/pscaler config`, tick **Enable UI scaling**, then pick 
 - `/pscaler pp` - Apply pixel-perfect scale for your screen
 - `/pscaler set N` - Set a specific scale (e.g. `/pscaler set 0.65`)
 - `/pscaler enable` / `/pscaler disable` - Toggle scaling (disable restores your original scale)
+- `/pscaler restore` - Undo everything: restore the scale you had before PeaversScaler changed anything
 - `/pscaler info` - Print scale diagnostics (screen size, configured vs applied scale)
 <!-- /peavers:usage -->
 

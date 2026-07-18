@@ -35,7 +35,7 @@ Scaler.PRESETS = {
 local applying = false      -- our own writes; event handlers and hook ignore them
 local reapplyQueued = false -- coalesce all re-apply triggers to next frame
 local pendingCombat = false -- apply deferred until PLAYER_REGEN_ENABLED
-local pendingRestore = false
+local pendingRestore = nil  -- { clear = bool }: restore deferred until combat ends
 local warnedOverride = false
 local suppressWarnUntil = 0
 
@@ -91,9 +91,10 @@ local function applyNow()
     C_Timer.After(0, function() applying = false end)
 end
 
-local function restoreNow()
+local function restoreNow(clearOriginal)
     if InCombatLockdown() then
-        pendingRestore = true
+        pendingRestore = { clear = clearOriginal }
+        Utils.Print(PS, "Your original UI scale will be restored when combat ends.")
         return
     end
 
@@ -110,6 +111,10 @@ local function restoreNow()
         SetCVar("useUiScale", 0)
         UIParent:SetScale(math.max(CVAR_MIN, Scaler:GetPixelPerfectScale()))
         Utils.Print(PS, "UI scale restored (approximately). /reload restores Blizzard's exact scale.")
+    end
+    if clearOriginal then
+        PS.Config.original = nil
+        PS.Config:Save()
     end
     C_Timer.After(0, function() applying = false end)
 end
@@ -165,7 +170,25 @@ function Scaler:Disable()
     PS.Config.enabled = false
     PS.Config:Save()
     pendingCombat = false
-    restoreNow()
+    restoreNow(false)
+end
+
+-- Full undo: restore everything to before PeaversScaler ever changed it, turn
+-- scaling off, and forget the snapshot (the next Enable captures a fresh one)
+function Scaler:RestoreOriginal()
+    if not PS.Config.original then
+        Utils.Print(PS, "Nothing to restore - PeaversScaler hasn't changed anything yet.")
+        return false
+    end
+    PS.Config.enabled = false
+    PS.Config:Save()
+    pendingCombat = false
+    restoreNow(true)
+    return true
+end
+
+function Scaler:HasOriginal()
+    return PS.Config.original ~= nil
 end
 
 -- Delay external-change warnings during login, when Blizzard applies its own
@@ -215,8 +238,9 @@ function Scaler:Initialize()
 
     Events:RegisterEvent("PLAYER_REGEN_ENABLED", function()
         if pendingRestore then
-            pendingRestore = false
-            restoreNow()
+            local clear = pendingRestore.clear
+            pendingRestore = nil
+            restoreNow(clear)
             return
         end
         if pendingCombat and PS.Config.enabled then

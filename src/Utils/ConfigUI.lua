@@ -54,6 +54,8 @@ function ConfigUI:BuildGeneralPage(parentFrame)
     screenInfo:SetPoint("TOPLEFT", indent, y)
     y = y - 26
 
+    local RefreshRestoreButton -- defined with the restore button below
+
     local toggle = W:CreateToggle(parentFrame, "Enable UI scaling", {
         checked = PS.Config.enabled == true,
         width = width,
@@ -65,6 +67,7 @@ function ConfigUI:BuildGeneralPage(parentFrame)
             end
             SetControlsEnabled(checked)
             RefreshSlider()
+            RefreshRestoreButton()
         end,
     })
     toggle:SetPoint("TOPLEFT", indent, y)
@@ -129,10 +132,45 @@ function ConfigUI:BuildGeneralPage(parentFrame)
         "Tip: 1.0 is the largest UI, not the default — lower values give a smaller, sharper UI.",
         { font = "GameFontNormalSmall", color = { 0.6, 0.6, 0.6 } })
     note:SetPoint("TOPLEFT", indent, y)
-    y = y - 22
+    y = y - 26
+
+    -- Deliberately NOT in `controls`: undo stays clickable even while scaling
+    -- is off, as long as a snapshot exists
+    local restoreBtn = W:CreateButton(parentFrame, "Restore my original scale", {
+        variant = "danger",
+        width = width,
+        height = 28,
+        onClick = function()
+            if Scaler:RestoreOriginal() then
+                toggle:SetChecked(false)
+                SetControlsEnabled(false)
+                RefreshSlider()
+            end
+            RefreshRestoreButton()
+        end,
+    })
+    restoreBtn:SetPoint("TOPLEFT", indent, y)
+    y = y - 34
+
+    local restoreHint = W:CreateLabel(parentFrame,
+        "Restore returns your UI scale to before PeaversScaler changed anything and turns scaling off.",
+        { font = "GameFontNormalSmall", color = { 0.5, 0.5, 0.5 } })
+    restoreHint:SetPoint("TOPLEFT", indent, y)
+    y = y - 24
+
+    RefreshRestoreButton = function()
+        if Scaler:HasOriginal() then
+            restoreBtn:EnableMouse(true)
+            restoreBtn:SetAlpha(1)
+        else
+            restoreBtn:EnableMouse(false)
+            restoreBtn:SetAlpha(0.4)
+        end
+    end
 
     SetControlsEnabled(PS.Config.enabled == true)
     RefreshSlider()
+    RefreshRestoreButton()
 
     parentFrame:SetHeight(math.abs(y) + 30)
 end
