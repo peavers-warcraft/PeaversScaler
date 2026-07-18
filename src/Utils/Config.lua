@@ -20,6 +20,9 @@ local PS_DEFAULTS = {
     scaleMode = "pixelPerfect",
     -- Used when scaleMode == "custom"
     scale = 1.0,
+    -- Pixel-perfect multiplier: 0 = auto (smallest pixel-aligned multiple
+    -- that's comfortably readable), 1+ = force that multiple
+    ppMultiplier = 0,
     -- Blizzard CVar state captured on first Enable, restored on Disable
     -- (original = nil until then; Save() persists ad-hoc keys)
     debugMode = false,

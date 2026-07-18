@@ -9,7 +9,7 @@ A World of Warcraft addon that scales the entire UI with resolution presets, a f
 <!-- peavers:features -->
 - Freeform slider to scale the whole WoW UI to any value (0.25 – 1.25)
 - One-click presets for 1080p, 1440p, and 4K
-- Pixel-perfect mode (768 ÷ screen height) for crisp 1:1 rendering, like classic ElvUI
+- Pixel-perfect mode (768 ÷ screen height) for crisp rendering, like classic ElvUI — on high-DPI screens it auto-picks a readable pixel-aligned multiple instead of an unusably tiny 1:1
 - Supports scales below Blizzard's 0.64 slider floor
 - Completely inert until you enable it — never touches your UI without opt-in
 - One-click restore that undoes everything, returning the scale you had before the addon changed anything
@@ -23,7 +23,8 @@ Open the settings with `/pscaler config`, tick **Enable UI scaling**, then pick 
 ### Slash Commands
 
 - `/pscaler` - Open settings
-- `/pscaler pp` - Apply pixel-perfect scale for your screen
+- `/pscaler pp` - Apply pixel-perfect scale for your screen (auto-picks a readable multiple)
+- `/pscaler pp N` - Force pixel-perfect multiple N (`1` = strict 1:1, `0` = back to auto)
 - `/pscaler set N` - Set a specific scale (e.g. `/pscaler set 0.65`)
 - `/pscaler enable` / `/pscaler disable` - Toggle scaling (disable restores your original scale)
 - `/pscaler restore` - Undo everything: restore the scale you had before PeaversScaler changed anything

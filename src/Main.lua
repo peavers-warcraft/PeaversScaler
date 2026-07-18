@@ -13,7 +13,12 @@ PeaversCommons.SlashCommands:Register(addonName, "pscaler", {
     default = function()
         PS.ConfigUI:OpenOptions()
     end,
-    pp = function()
+    pp = function(rest)
+        local multiplier = tonumber(rest)
+        if multiplier then
+            -- 0 = auto; 1+ forces that pixel-aligned multiple
+            PS.Config.ppMultiplier = math.max(0, math.floor(multiplier))
+        end
         PS.Config.scaleMode = "pixelPerfect"
         PS.Config:Save()
         if not PS.Config.enabled then
@@ -21,7 +26,8 @@ PeaversCommons.SlashCommands:Register(addonName, "pscaler", {
         else
             PS.Scaler:Apply()
         end
-        Utils.Print(PS, string.format("Pixel perfect scale applied (%.4f).", PS.Scaler:GetPixelPerfectScale()))
+        Utils.Print(PS, string.format("Pixel perfect scale applied: %.4f (base %.4f, x%d).",
+            PS.Scaler:GetConfiguredScale(), PS.Scaler:GetPixelPerfectScale(), PS.Scaler:GetPixelPerfectMultiplier()))
     end,
     set = function(rest)
         local value = tonumber(rest)
@@ -57,7 +63,8 @@ PeaversCommons.SlashCommands:Register(addonName, "pscaler", {
     help = function()
         Utils.Print(PS, "Commands:")
         print("  /pscaler - Open settings")
-        print("  /pscaler pp - Apply pixel-perfect scale for your screen")
+        print("  /pscaler pp - Apply pixel-perfect scale (auto-picks a readable multiple)")
+        print("  /pscaler pp N - Force pixel-perfect multiple N (1 = strict 1:1, 0 = auto)")
         print("  /pscaler set N - Set a specific scale (e.g. 0.65)")
         print("  /pscaler enable - Enable UI scaling")
         print("  /pscaler disable - Disable and restore your original scale")

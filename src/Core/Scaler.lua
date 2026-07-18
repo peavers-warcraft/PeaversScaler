@@ -22,6 +22,7 @@ local UI_HEIGHT = 768
 local CVAR_MIN, CVAR_MAX = 0.64, 1.15
 local SCALE_MIN, SCALE_MAX = 0.25, 1.25 -- floor leaves room for 5K (768/2880)
 local EPSILON = 0.001
+local COMFORT_MIN = 0.5 -- smallest scale "auto" pixel perfect will pick
 
 Scaler.SCALE_MIN = SCALE_MIN
 Scaler.SCALE_MAX = SCALE_MAX
@@ -53,10 +54,39 @@ function Scaler:GetPixelPerfectScale()
     return UI_HEIGHT / physicalHeight
 end
 
+-- Any integer multiple of the base scale keeps UI units on whole-pixel
+-- boundaries (each unit maps to exactly NxN device pixels), so it stays
+-- perfectly crisp. On dense displays (4K base = 0.3556) x1 is unusably
+-- small; "auto" picks the smallest multiple that clears COMFORT_MIN.
+function Scaler:GetPixelPerfectMultiplier()
+    local forced = tonumber(PS.Config.ppMultiplier) or 0
+    if forced >= 1 then
+        return math.floor(forced)
+    end
+    local base = self:GetPixelPerfectScale()
+    local k = 1
+    while k * base < COMFORT_MIN and (k + 1) * base <= SCALE_MAX do
+        k = k + 1
+    end
+    return k
+end
+
+-- All pixel-aligned scales that fit the slider range, for display
+function Scaler:GetPixelPerfectMultiples()
+    local base = self:GetPixelPerfectScale()
+    local multiples = {}
+    local k = 1
+    while k * base <= SCALE_MAX and k <= 4 do
+        table.insert(multiples, { multiplier = k, scale = k * base })
+        k = k + 1
+    end
+    return multiples
+end
+
 function Scaler:GetConfiguredScale()
     local mode = PS.Config.scaleMode
     if mode == "pixelPerfect" then
-        return self:GetPixelPerfectScale()
+        return self:GetPixelPerfectScale() * self:GetPixelPerfectMultiplier()
     end
     for _, preset in ipairs(self.PRESETS) do
         if preset.key == mode then
@@ -201,7 +231,15 @@ function Scaler:PrintInfo()
     local width, height = GetPhysicalScreenSize()
     Utils.Print(PS, "Scale diagnostics:")
     print(string.format("  Physical screen: %dx%d", width or 0, height or 0))
-    print(string.format("  Pixel perfect scale: %.4f", self:GetPixelPerfectScale()))
+    local parts = {}
+    for _, m in ipairs(self:GetPixelPerfectMultiples()) do
+        table.insert(parts, string.format("x%d = %.4f", m.multiplier, m.scale))
+    end
+    print(string.format("  Pixel perfect scale: %.4f | Aligned multiples: %s",
+        self:GetPixelPerfectScale(), table.concat(parts, ", ")))
+    print(string.format("  Pixel perfect multiplier: %s (resolves to x%d)",
+        (tonumber(PS.Config.ppMultiplier) or 0) >= 1 and tostring(PS.Config.ppMultiplier) or "auto",
+        self:GetPixelPerfectMultiplier()))
     print(string.format("  Mode: %s | Configured scale: %.4f", tostring(PS.Config.scaleMode), self:GetConfiguredScale()))
     print(string.format("  UIParent scale: %.4f | Effective scale: %.4f", UIParent:GetScale(), UIParent:GetEffectiveScale()))
     print(string.format("  Enabled: %s | uiScale CVar: %s | useUiScale: %s",

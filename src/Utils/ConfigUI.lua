@@ -47,9 +47,13 @@ function ConfigUI:BuildGeneralPage(parentFrame)
     y = newY - 8
 
     local screenWidth, screenHeight = GetPhysicalScreenSize()
+    local alignedParts = {}
+    for _, m in ipairs(Scaler:GetPixelPerfectMultiples()) do
+        table.insert(alignedParts, string.format("x%d = %.4f", m.multiplier, m.scale))
+    end
     local screenInfo = W:CreateLabel(parentFrame,
-        string.format("Your screen is %dx%d — pixel perfect scale is %.4f",
-            screenWidth or 0, screenHeight or 0, Scaler:GetPixelPerfectScale()),
+        string.format("Your screen is %dx%d — pixel-aligned scales: %s",
+            screenWidth or 0, screenHeight or 0, table.concat(alignedParts, ", ")),
         { font = "GameFontNormalSmall", color = { 0.7, 0.7, 0.7 } })
     screenInfo:SetPoint("TOPLEFT", indent, y)
     y = y - 26
@@ -115,7 +119,8 @@ function ConfigUI:BuildGeneralPage(parentFrame)
     end
     y = y - 34
 
-    local ppButton = W:CreateButton(parentFrame, "Set Pixel Perfect", {
+    local ppTarget = Scaler:GetPixelPerfectScale() * Scaler:GetPixelPerfectMultiplier()
+    local ppButton = W:CreateButton(parentFrame, string.format("Set Pixel Perfect (%.4f)", ppTarget), {
         width = width,
         variant = "primary",
         onClick = function()
@@ -127,6 +132,14 @@ function ConfigUI:BuildGeneralPage(parentFrame)
     ppButton:SetPoint("TOPLEFT", indent, y)
     y = y - 34
     table.insert(controls, ppButton)
+
+    local ppHint = W:CreateLabel(parentFrame,
+        string.format("Picks the smallest pixel-aligned scale that's still readable (x%d on this screen). /pscaler pp 1 forces strict 1:1.",
+            Scaler:GetPixelPerfectMultiplier()),
+        { font = "GameFontNormalSmall", color = { 0.5, 0.5, 0.5 } })
+    ppHint:SetPoint("TOPLEFT", indent, y)
+    y = y - 22
+    table.insert(controls, ppHint)
 
     local note = W:CreateLabel(parentFrame,
         "Tip: 1.0 is the largest UI, not the default — lower values give a smaller, sharper UI.",
