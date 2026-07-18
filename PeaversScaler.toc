@@ -1,0 +1,25 @@
+## Interface: 120001, 120005, 120007
+
+## Title: |cff3abdf7Peavers|rScaler
+## Notes: Scale the entire WoW UI with presets, a freeform slider, and pixel-perfect mode
+## Author: Peavers
+## Version: 1.0.0
+
+## IconTexture: Interface\AddOns\PeaversCommons\src\Media\Icon.tga
+## Category-enUS: Peavers
+
+## X-Website: https://peavers.io
+## X-Source-Code: https://github.com/peavers-warcraft/PeaversScaler
+## X-Curse-Project-ID: 0
+
+## Dependencies: PeaversCommons, PeaversConfig
+## SavedVariables: PeaversScalerDB
+
+Changelog.lua
+
+src\Utils\Config.lua
+src\Core\Scaler.lua
+src\Utils\ConfigUI.lua
+src\Utils\Patrons.lua
+
+src\Main.lua

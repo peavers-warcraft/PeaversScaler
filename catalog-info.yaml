@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: PeaversScaler
+  description: "A World of Warcraft addon that scales the entire UI with resolution presets, a freeform slider, and pixel-perfect mode."
+  annotations:
+    github.com/project-slug: peavers-warcraft/PeaversScaler
+spec:
+  type: library
+  lifecycle: production
+  owner: peavers-warcraft
