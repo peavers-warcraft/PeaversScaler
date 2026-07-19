@@ -60,7 +60,7 @@ function ConfigUI:BuildGeneralPage(parentFrame)
 
     local RefreshRestoreButton -- defined with the restore button below
 
-    local toggle = W:CreateToggle(parentFrame, "Enable UI scaling", {
+    local toggle = W:CreateCheckbox(parentFrame, "Enable UI scaling", {
         checked = PS.Config.enabled == true,
         width = width,
         onChange = function(checked)
