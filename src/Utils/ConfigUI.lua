@@ -188,8 +188,34 @@ function ConfigUI:BuildGeneralPage(parentFrame)
     parentFrame:SetHeight(math.abs(y) + 30)
 end
 
+function ConfigUI:BuildInfoPage(parentFrame)
+    PeaversCommons.ConfigUIUtils.BuildInfoPage(parentFrame, "Scaler", {
+        "Scales the entire WoW interface with resolution presets, a freeform " ..
+            "slider, and a pixel-perfect mode - including scales below " ..
+            "Blizzard's own 0.64 slider floor.",
+        { command = "/pscaler", desc = "open the settings" },
+        { command = "/pscaler pp", desc = "apply the pixel-perfect scale for your screen" },
+        { command = "/pscaler set N", desc = "set a specific scale, e.g. 0.65" },
+        { command = "/pscaler restore", desc = "undo everything and restore your original scale" },
+        { command = "/pscaler info", desc = "print scale diagnostics" },
+
+        { header = "It never acts without opt-in" },
+        "The addon is completely inert until you tick Enable UI scaling. Your " ..
+            "original scale is remembered from before the first change, and " ..
+            "Restore returns to it exactly - disabling the addon does the same.",
+
+        { header = "About pixel-perfect mode" },
+        "Pixel-perfect scale (768 divided by screen height) renders the UI " ..
+            "crisp with no fractional pixel blur. On high-DPI screens a strict " ..
+            "1:1 scale would be unusably tiny, so the addon auto-picks a " ..
+            "readable pixel-aligned multiple instead; /pscaler pp N forces a " ..
+            "specific multiple if you prefer.",
+    })
+end
+
 function ConfigUI:GetPages()
     return {
+        { key = "info", label = "Information", builder = function(f) ConfigUI:BuildInfoPage(f) end },
         { key = "general", label = "General", builder = function(f) ConfigUI:BuildGeneralPage(f) end },
     }
 end

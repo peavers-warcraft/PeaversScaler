@@ -125,9 +125,7 @@ PeaversCommons.Events:Init(addonName, function()
             description = "Scale the entire WoW UI",
             addonRef = PS,
             config = PS.Config,
-            buildPanel = function(parentFrame)
-                return PS.ConfigUI:BuildIntoFrame(parentFrame)
-            end,
+            pages = PS.ConfigUI:GetPages(),
             order = 12,
         })
     end
